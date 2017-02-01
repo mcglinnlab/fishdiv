@@ -56,9 +56,10 @@ names(gd_sci_names) = 'species'
 
 dat_sub = subset(dat, dat$SPECIESSCIENTIFICNAME %in% gd_sci_names$species)
 
+
 #output names that we have filtered out of the dataset
 uni_sci_sp = unique(dat$SPECIESSCIENTIFICNAME)
-write.csv(uni_sci_sp[!(uni_sci_sp %in% gd_sci_names$species)], './data/sp_names_filtered_out.csv', row.names=F)
+##write.csv(uni_sci_sp[!(uni_sci_sp %in% gd_sci_names$species)], './data/sp_names_filtered_out.csv', row.names=F)
 
 # subset fish columns
 fish_cols = c('EVENTNAME','COLLECTIONNUMBER','SPECIESSCIENTIFICNAME',
@@ -90,11 +91,16 @@ sitexsp = tapply(dat_sub$NUMBERTOTAL,
                       dat_sub$SPECIESSCIENTIFICNAME), 
                  sum)
 sitexsp = ifelse(is.na(sitexsp), 0, sitexsp)
+##write.csv(sitexsp,file = "./data/sitexsp_eventnames.csv", row.names=TRUE)
+sitexsp = read.csv('C:/Users/Nathan/Dropbox/Biodiversity/fishdiv/data/sitexsp_eventnames.csv')
 sitexsp
-write.csv(sitexsp,file = "./data/sitexsp_eventnames.csv", 
-          row.names=TRUE)
 
-
+sitexenv = tapply(dat_sub$REGION,
+                  list(dat_sub$EVENTNAME,
+                       dat_sub$SPECIESSCIENTIFICNAME),
+                  sum)
+sitexenv = ifelse(is.na(sitexenv), 0, sitexenv)
+sitexenv
 
 install.packages('devtools')
 library(devtools)
