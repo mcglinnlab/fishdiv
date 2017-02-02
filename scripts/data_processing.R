@@ -11,7 +11,7 @@
 
 #import data
 library(readr)
-dat = read_csv('C:/Users/Nathan/Dropbox/Biodiversity/fishdiv/data/bakernj.Coastal Survey.ABUNDANCEBIOMASS.2016-11-03T11.33.55.zip')
+dat = read_csv('./data/bakernj.Coastal Survey.ABUNDANCEBIOMASS.2016-11-03T11.33.55.zip')
 ##determining number of unique nets (collection number) for each trawl (event name)
 n = NULL
 uni_event = unique(dat$EVENTNAME)
@@ -23,7 +23,7 @@ n
 sum(n)
 table(n)
 
-fish_species = read.csv('C:/Users/Nathan/Dropbox/Biodiversity/fishdiv/data/fish_species.csv', header=FALSE, colClasses='character')
+fish_species = read.csv('./data/fish_species.csv', header=FALSE, colClasses='character')
 names(fish_species) = 'species'
 
 
@@ -51,11 +51,12 @@ gd_sci_names = unique(dat$SPECIESSCIENTIFICNAME[dat$SPECIESCOMMONNAME %in% gd_co
 
 #manually enter in small subset of species that lack common names
 
-gd_sci_names = read.csv('C:/Users/Nathan/Dropbox/Biodiversity/fishdiv/data/gd_sci_names.csv')
+gd_sci_names = read.csv('./data/gd_sci_names.csv')
 names(gd_sci_names) = 'species'
 
 dat_sub = subset(dat, dat$SPECIESSCIENTIFICNAME %in% gd_sci_names$species)
-
+dim(dat_sub)
+head(dat_sub)
 
 #output names that we have filtered out of the dataset
 uni_sci_sp = unique(dat$SPECIESSCIENTIFICNAME)
@@ -92,19 +93,24 @@ sitexsp = tapply(dat_sub$NUMBERTOTAL,
                  sum)
 sitexsp = ifelse(is.na(sitexsp), 0, sitexsp)
 ##write.csv(sitexsp,file = "./data/sitexsp_eventnames.csv", row.names=TRUE)
-sitexsp = read.csv('C:/Users/Nathan/Dropbox/Biodiversity/fishdiv/data/sitexsp_eventnames.csv')
-sitexsp
+sitexsp = read.csv('./data/sitexsp_eventnames.csv')
+names(sitexsp) = c('EVENTNAME', names(sitexsp)[-1])
 
-sitexenv = tapply(dat_sub$REGION,
-                  list(dat_sub$EVENTNAME,
-                       dat_sub$SPECIESSCIENTIFICNAME),
-                  sum)
-sitexenv = ifelse(is.na(sitexenv), 0, sitexenv)
-sitexenv
+env = dat_sub[match(sitexsp$EVENTNAME, dat_sub$EVENTNAME), 
+              c('REGION', 'LONGITUDESTART', 'LATITUDESTART')]
+names(env) = c('REGION', 'x', 'y')
 
 install.packages('devtools')
 library(devtools)
 install_github('MoBiodiv/mobr')
 library(mobr)
+
+sitexsp2 = subset(sitexsp, env$REGION %in% c('SOUTH CAROLINA', 'GEORGIA'))
+env_scga = subset(env, REGION %in% c('SOUTH CAROLINA', 'GEORGIA'))
+
+mob_in = make_mob_in(sitexsp2, env_scga)
+deltaS = get_delta_stats(mob_in, 'REGION', ref_group='SOUTH CAROLINA')
+
+
 
 
