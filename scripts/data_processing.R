@@ -100,6 +100,36 @@ env = dat_sub[match(sitexsp$EVENTNAME, dat_sub$EVENTNAME),
               c('REGION', 'LONGITUDESTART', 'LATITUDESTART')]
 names(env) = c('REGION', 'x', 'y')
 
+
+library(vegan)
+fish_ca = cca(sitexsp)
+##integer overflow
+fish_dca = decorana(sitexsp)
+summary(fish_dca)
+
+fish_rda = rda(sitexsp ~ env$REGION + env$x+ env$y)
+fish_rda
+plot(fish_rda, type = 'n', scaling = 1)
+orditorp(fish_rda, display = 'species', col = 'blue')
+anova(fish_rda)
+##Permutation test for rda under reduced model
+##Permutation: free
+##Number of permutations: 999
+
+##Model: rda(formula = sitexsp ~ env$REGION + env$x + env$y)
+##Df Variance      F Pr(>F)    
+##Model    2456 24603869 5.4236  0.001 ***
+  ##Residual 2542  4695327                  
+##---
+  ##Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+summary(env)
+
+fish1990 = subset(sitexsp[, EVENTNAME = 1990001:1990547])
+fish2015 = subset(sitexsp[, EVENTNAME = 2015001:2015657])
+
+
+
 install.packages('devtools')
 library(devtools)
 install_github('MoBiodiv/mobr')
