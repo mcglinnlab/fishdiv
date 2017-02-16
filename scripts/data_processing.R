@@ -65,7 +65,7 @@ uni_sci_sp = unique(dat$SPECIESSCIENTIFICNAME)
 # subset fish columns
 fish_cols = c('EVENTNAME','COLLECTIONNUMBER','SPECIESSCIENTIFICNAME',
               'SPECIESCOMMONNAME','NUMBERTOTAL','EFFORT','LOCATION',
-              'REGION','DEPTHZONE','STATIONCODE')
+              'REGION','DEPTHZONE','STATIONCODE', )
 dat_sub[1:5 , fish_cols]
 
 # run check that only one date applies to each event name
@@ -93,13 +93,13 @@ sitexsp = tapply(dat_sub$NUMBERTOTAL,
                  sum)
 sitexsp = ifelse(is.na(sitexsp), 0, sitexsp)
 ##write.csv(sitexsp,file = "./data/sitexsp_eventnames.csv", row.names=TRUE)
-sitexsp = read.csv('./data/sitexsp_eventnames.csv')
-names(sitexsp) = c('EVENTNAME', names(sitexsp)[-1])
+sitexsp = read.csv('./data/sitexsp_eventnames.csv', row.names = 1)
 
-env = dat_sub[match(sitexsp$EVENTNAME, dat_sub$EVENTNAME), 
-              c('REGION', 'LONGITUDESTART', 'LATITUDESTART')]
-names(env) = c('REGION', 'x', 'y')
-
+env = dat_sub[match(row.names(sitexsp), dat_sub$EVENTNAME), 
+              c('EVENTNAME', 'REGION', 'LONGITUDESTART', 'LATITUDESTART')]
+names(env) = c('EVENTNAME', 'REGION', 'x', 'y')
+#write.csv(env, file="./data/env.csv", row.names=FALSE)
+env = read.csv('./data/env.csv')
 
 library(vegan)
 fish_ca = cca(sitexsp)
@@ -111,6 +111,8 @@ fish_rda = rda(sitexsp ~ env$REGION + env$x+ env$y)
 fish_rda
 plot(fish_rda, type = 'n', scaling = 1)
 orditorp(fish_rda, display = 'species', col = 'blue')
+
+# test significance of overall model
 anova(fish_rda)
 ##Permutation test for rda under reduced model
 ##Permutation: free
@@ -119,28 +121,34 @@ anova(fish_rda)
 ##Model: rda(formula = sitexsp ~ env$REGION + env$x + env$y)
 ##Df Variance      F Pr(>F)    
 ##Model    2456 24603869 5.4236  0.001 ***
-  ##Residual 2542  4695327                  
-##---
-  ##Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+##Residual 2542  4695327                  
+##Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+# tests partial effects of each variable in model
+anova(fish_rda, by='margin')
 
 summary(env)
 
-fish1990 = subset(sitexsp[, EVENTNAME = 1990001:1990547])
-fish2015 = subset(sitexsp[, EVENTNAME = 2015001:2015657])
+fish1990 = subset(sitexsp, env$EVENTNAME %in% 1990001:1990547)
+env1990 = subset(env, env$EVENTNAME %in% 1990001:1990547)
+fish2015 = subset(sitexsp[ EVENTNAME = 2015001:2015657])
 
 
 
-install.packages('devtools')
 library(devtools)
 install_github('MoBiodiv/mobr')
 library(mobr)
 
-sitexsp2 = subset(sitexsp, env$REGION %in% c('SOUTH CAROLINA', 'GEORGIA'))
-env_scga = subset(env, REGION %in% c('SOUTH CAROLINA', 'GEORGIA'))
+sitexscga = subset(fish1990, env1990$REGION %in% c('SOUTH CAROLINA', 'GEORGIA'))
+env_scga = subset(env1990, REGION %in% c('SOUTH CAROLINA', 'GEORGIA'))
 
-mob_in = make_mob_in(sitexsp2, env_scga)
-deltaS = get_delta_stats(mob_in, 'REGION', ref_group='SOUTH CAROLINA')
+mob_in = make_mob_in(sitexscga, env_scga)
 
+mob_stats = get_mob_stats(mob_in, 'REGION')
+
+deltaS = get_delta_stats(mob_in, 'REGION', ref_group='SOUTH CAROLINA', log_scale = T,
+                         nperm=5)
+plot(deltaS, 'GEORGIA', 'SOUTH CAROLINA', same_scale=T)
 
 
 
