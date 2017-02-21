@@ -152,3 +152,39 @@ plot(deltaS, 'GEORGIA', 'SOUTH CAROLINA', same_scale=T)
 
 
 
+fish_historic = subset(sitexsp, env$EVENTNAME %in% 1990001:1995563)
+env_historic = subset(env, env$EVENTNAME %in% 1990001:1995563)
+fish_modern = subset(sitexsp, env$EVENTNAME %in% 2010001:2015657)
+env_modern = subset(env, env$EVENTNAME %in% 2010001:2015657)
+
+##historic analysis for all 5 regions
+historic_mob_in = make_mob_in(fish_historic, env_historic)
+historic_mob_stats = get_mob_stats(historic_mob_in, 'REGION')
+historic_deltaS = get_delta_stats(historic_mob_in, 'REGION', ref_group = 'SOUTH CAROLINA', log_scale = T,
+                                  nperm = 10)
+plot(historic_deltaS, 'GEORGIA', 'SOUTH CAROLINA', same_scale = T)
+
+##historic analysis for FL and SC
+hist_sitexscfl = subset(fish_historic, env_historic$REGION %in% c('SOUTH CAROLINA', 'FLORIDA'))
+hist_envscfl = subset(env_historic, REGION %in% c('SOUTH CAROLINA', 'FLORIDA'))
+hist_mob_inscfl = make_mob_in(hist_sitexscfl, hist_envscfl)
+mob_stats = get_mob_stats(hist_mob_inscfl, 'REGION')
+hist_deltaS = get_delta_stats(hist_mob_inscfl, 'REGION', ref_group = 'SOUTH CAROLINA', log_scale = T,
+                               nperm = 50)
+plot(deltaS, 'FLORIDA', 'SOUTH CAROLINA', same_scale = T)
+
+##modern analysis for all 5 regions
+modern_mob_in = make_mob_in(fish_modern, env_modern)
+modern_mob_stats = get_mob_stats(modern_mob_in, 'REGION')
+modern_deltaS = get_delta_stats(modern_mob_in, 'REGION', ref_group = 'SOUTH CAROLINA', log_scale = T,
+                                nperm = 10)
+plot(modern_deltaS, 'GEORGIA', 'SOUTH CAROLINA', same_scale = T)
+
+##modern analysis for FL and SC
+mod_sitexscfl = subset(fish_modern, env_modern$REGION %in% c('SOUTH CAROLINA', 'FLORIDA'))
+mod_envscfl = subset(env_modern, REGION %in% c('SOUTH CAROLINA', 'FLORIDA'))
+mod_mob_inscfl = make_mob_in(mod_sitexscfl, mod_envscfl)
+mob_stats = get_mob_stats(mod_mob_inscfl, 'REGION')
+mod_deltaS = get_delta_stats(mod_mob_inscfl, 'REGION', ref_group = 'SOUTH CAROLINA', log_scale = T,
+                              nperm = 50)
+plot(deltaS, 'FLORIDA', 'SOUTH CAROLINA', same_scale = T)
