@@ -150,14 +150,26 @@ deltaS = get_delta_stats(mob_in, 'REGION', ref_group='SOUTH CAROLINA', log_scale
                          nperm=5)
 plot(deltaS, 'GEORGIA', 'SOUTH CAROLINA', same_scale=T)
 
+# add Time Period variable to env
+
+env$period = ifelse(env$EVENTNAME %in% 1990001:1995563,
+                    'past', ifelse(env$EVENTNAME %in% 2010001:2015657,
+                                   'modern', NA))
+
+##historic and modern data for 1990-1995 and 2010-2015 ----
+fish_historic = subset(sitexsp, !is.na(env$period))
+env_historic = subset(env, !is.na(env$period))
+
+historic_mob_in = make_mob_in(fish_historic, env_historic)
+historic_mob_stats = get_mob_stats(historic_mob_in, 'period', nperm=200)
+plot(historic_mob_stats, multipanel=T)
+historic_deltaS = get_delta_stats(historic_mob_in, 'period', ref_group = 'past',
+                                  log_scale = T, nperm = 10)
+plot(historic_deltaS, 'modern', 'past', same_scale = T)
 
 
-fish_historic = subset(sitexsp, env$EVENTNAME %in% 1990001:1995563)
-env_historic = subset(env, env$EVENTNAME %in% 1990001:1995563)
-fish_modern = subset(sitexsp, env$EVENTNAME %in% 2010001:2015657)
-env_modern = subset(env, env$EVENTNAME %in% 2010001:2015657)
 
-##historic analysis for all 5 regions
+##historic analysis for all 5 regions -----
 historic_mob_in = make_mob_in(fish_historic, env_historic)
 historic_mob_stats = get_mob_stats(historic_mob_in, 'REGION')
 historic_deltaS = get_delta_stats(historic_mob_in, 'REGION', ref_group = 'SOUTH CAROLINA', log_scale = T,
@@ -178,7 +190,7 @@ modern_mob_in = make_mob_in(fish_modern, env_modern)
 modern_mob_stats = get_mob_stats(modern_mob_in, 'REGION')
 modern_deltaS = get_delta_stats(modern_mob_in, 'REGION', ref_group = 'SOUTH CAROLINA', log_scale = T,
                                 nperm = 10)
-plot(modern_deltaS, 'GEORGIA', 'SOUTH CAROLINA', same_scale = T)
+plot(modern_deltaS, 'FLORIDA', 'SOUTH CAROLINA', same_scale = T)
 
 ##modern analysis for FL and SC
 mod_sitexscfl = subset(fish_modern, env_modern$REGION %in% c('SOUTH CAROLINA', 'FLORIDA'))
