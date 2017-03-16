@@ -11,7 +11,7 @@
 
 #import data
 library(readr)
-dat = read_csv('./data/bakernj.Coastal Survey.ABUNDANCEBIOMASS.2016-11-03T11.33.55.zip')
+dat = read.csv('./data/bakernj.Coastal Survey.ABUNDANCEBIOMASS.2016-11-03T11.33.55.csv')
 ##determining number of unique nets (collection number) for each trawl (event name)
 n = NULL
 uni_event = unique(dat$EVENTNAME)
@@ -65,7 +65,7 @@ uni_sci_sp = unique(dat$SPECIESSCIENTIFICNAME)
 # subset fish columns
 fish_cols = c('EVENTNAME','COLLECTIONNUMBER','SPECIESSCIENTIFICNAME',
               'SPECIESCOMMONNAME','NUMBERTOTAL','EFFORT','LOCATION',
-              'REGION','DEPTHZONE','STATIONCODE', )
+              'REGION','DEPTHZONE','STATIONCODE')
 dat_sub[1:5 , fish_cols]
 
 # run check that only one date applies to each event name
@@ -208,17 +208,47 @@ library(maptools)
 library(rgdal)
 library(lattice)
 library(classInt)
-southeast = map(database = "state", regions = c("north carolina", "south carolina", "georgia", "florida"))
-se_coast = map(database = "county", regions = c("north carolina,dare", "north carolina,pasquotank", "north carolina,hyde", "north carolina,pamlico", "north carolina,beaufort", "north carolina,onslow", "north carolina,carteret", 
-                                                "north carolina,pender", "north carolina,new hanover", "north carolina,brunswick", "north carolina,craven", "north carolina,perquimans", "north carolina,camden", "north carolina,currituck:knotts",
-                                                "north carolina,currituck:knotts", "north carolina,currituck:spit", "north carolina,tyrell", "north carolina,washington", "north carolina,bertie", "north carolina,hertford", "north carolina,chowan",
-                                                "north carolina,jones", "north carolina,columbus", "south carolina,horry", "south carolina,marion", "south carolina,georgetown", "south carolina,charleston", "south carolina,berkeley",
-                                                "south carolina,dorchester", "south carolina,colleton", "south carolina,beaufort", "south carolina,jasper", "south carolina,hampton", "georgia,effingham", "georgia,chatham", "georgia,bryan", "georgia,liberty",
-                                                "georgia,mcintosh", "georgia,long", "georgia,glynn", "georgia,wayne", "georgia,camden", "georgia,brantley", "georgia,chariton", "florida,nassau", "florida,duval", "florida,saint johns", "florida,clay",
-                                                "florida,putnam", "florida,flagler", "florida,volusia", "florida,brevard", "florida,indian river", "florida,orange", "florida,osceola", "florida,seminole",
-                                                fill = T, plot = F))
-IDs = sub(c("^north carolina,", "^south carolina,", "^georgia,", "^florida,"),"",se_coast$names)
-secoast_sp = map2SpatialPolygons(se_coast,IDs,CRS("+proj=longlat"))
+
+counties =  c("north carolina,dare", "north carolina,pasquotank", "north
+carolina,hyde", "north carolina,pamlico", "north carolina,beaufort", "north
+carolina,onslow", "north carolina,carteret", "north carolina,pender", "north
+carolina,new hanover", "north carolina,brunswick", "north carolina,craven",
+"north carolina,perquimans", "north carolina,camden", "north
+carolina,currituck:knotts", "north carolina,currituck:knotts", "north
+carolina,currituck:spit", "north carolina,tyrell", "north
+carolina,washington", "north carolina,bertie", "north carolina,hertford",
+"north carolina,chowan", "north carolina,jones", "north carolina,columbus",
+"south carolina,horry", "south carolina,marion", "south carolina,georgetown",
+"south carolina,charleston", "south carolina,berkeley", "south
+carolina,dorchester", "south carolina,colleton", "south carolina,beaufort",
+"south carolina,jasper", "south carolina,hampton", "georgia,effingham",
+"georgia,chatham", "georgia,bryan", "georgia,liberty", "georgia,mcintosh",
+"georgia,long", "georgia,glynn", "georgia,wayne", "georgia,camden",
+"georgia,brantley", "georgia,chariton", "florida,nassau", "florida,duval",
+"florida,saint johns", "florida,clay", "florida,putnam", "florida,flagler",
+"florida,volusia", "florida,brevard", "florida,indian river",
+"florida,orange", "florida,osceola", "florida,seminole")
+
+southeast = map(database = "state", 
+                regions = c("north carolina", "south carolina", "georgia", "florida"))
+se_coast = map(database = "county", regions = counties, fill = T, plot = F)
+secoast_sp = map2SpatialPolygons(se_coast, se_coast$names, CRS("+proj=longlat"))
 plot(secoast_sp, axes = T)
-fish_pastpop = subset(sitexsp %in% env$period=="past")
+fish_pastpop = subset(sitexsp %in% env$period == "past")
 se_spdf = SpatialPolygonsDataFrame(secoast_sp,fish_historic)
+spplot(se_spdf, '')
+
+
+?vegan::diversity
+
+S = 1:1000
+h = hist(S, breaks=10)
+
+S_bins = as.integer(cut(S, h$breaks))
+plot(1:1000, 1:1000, col=terrain.colors(10)[S_bins])
+
+
+map(database = "county", regions = counties)
+points(long, lat, col=)
+
+
