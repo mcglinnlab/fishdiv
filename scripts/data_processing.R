@@ -170,33 +170,55 @@ plot(historic_deltaS, 'modern', 'past', same_scale = T)
 
 
 ##historic analysis for all 5 regions -----
-historic_mob_in = make_mob_in(fish_historic, env_historic)
-historic_mob_stats = get_mob_stats(historic_mob_in, 'REGION')
-historic_deltaS = get_delta_stats(historic_mob_in, 'REGION', ref_group = 'SOUTH CAROLINA', log_scale = T,
-                                  nperm = 10)
-plot(historic_deltaS, 'GEORGIA', 'SOUTH CAROLINA', same_scale = T)
+##historic_mob_in = make_mob_in(fish_historic, env_historic)
+##historic_mob_stats = get_mob_stats(historic_mob_in, 'REGION')
+##historic_deltaS = get_delta_stats(historic_mob_in, 'REGION', ref_group = 'SOUTH CAROLINA', log_scale = T,
+                                  ##nperm = 10)
+##plot(historic_deltaS, 'GEORGIA', 'SOUTH CAROLINA', same_scale = T)
 
 ##historic analysis for FL and SC
-hist_sitexscfl = subset(fish_historic, env_historic$REGION %in% c('SOUTH CAROLINA', 'FLORIDA'))
-hist_envscfl = subset(env_historic, REGION %in% c('SOUTH CAROLINA', 'FLORIDA'))
-hist_mob_inscfl = make_mob_in(hist_sitexscfl, hist_envscfl)
-mob_stats = get_mob_stats(hist_mob_inscfl, 'REGION')
-hist_deltaS = get_delta_stats(hist_mob_inscfl, 'REGION', ref_group = 'SOUTH CAROLINA', log_scale = T,
-                               nperm = 50)
-plot(deltaS, 'FLORIDA', 'SOUTH CAROLINA', same_scale = T)
+##hist_sitexscfl = subset(fish_historic, env_historic$REGION %in% c('SOUTH CAROLINA', 'FLORIDA'))
+##hist_envscfl = subset(env_historic, REGION %in% c('SOUTH CAROLINA', 'FLORIDA'))
+##hist_mob_inscfl = make_mob_in(hist_sitexscfl, hist_envscfl)
+##mob_stats = get_mob_stats(hist_mob_inscfl, 'REGION')
+##hist_deltaS = get_delta_stats(hist_mob_inscfl, 'REGION', ref_group = 'SOUTH CAROLINA', log_scale = T,
+                               ##nperm = 50)
+##plot(deltaS, 'FLORIDA', 'SOUTH CAROLINA', same_scale = T)
 
 ##modern analysis for all 5 regions
-modern_mob_in = make_mob_in(fish_modern, env_modern)
-modern_mob_stats = get_mob_stats(modern_mob_in, 'REGION')
-modern_deltaS = get_delta_stats(modern_mob_in, 'REGION', ref_group = 'SOUTH CAROLINA', log_scale = T,
-                                nperm = 10)
-plot(modern_deltaS, 'FLORIDA', 'SOUTH CAROLINA', same_scale = T)
+##modern_mob_in = make_mob_in(fish_modern, env_modern)
+##modern_mob_stats = get_mob_stats(modern_mob_in, 'REGION')
+##modern_deltaS = get_delta_stats(modern_mob_in, 'REGION', ref_group = 'SOUTH CAROLINA', log_scale = T,
+                                ##nperm = 10)
+##plot(modern_deltaS, 'FLORIDA', 'SOUTH CAROLINA', same_scale = T)
 
 ##modern analysis for FL and SC
-mod_sitexscfl = subset(fish_modern, env_modern$REGION %in% c('SOUTH CAROLINA', 'FLORIDA'))
-mod_envscfl = subset(env_modern, REGION %in% c('SOUTH CAROLINA', 'FLORIDA'))
-mod_mob_inscfl = make_mob_in(mod_sitexscfl, mod_envscfl)
-mob_stats = get_mob_stats(mod_mob_inscfl, 'REGION')
-mod_deltaS = get_delta_stats(mod_mob_inscfl, 'REGION', ref_group = 'SOUTH CAROLINA', log_scale = T,
-                              nperm = 50)
-plot(deltaS, 'FLORIDA', 'SOUTH CAROLINA', same_scale = T)
+##mod_sitexscfl = subset(fish_modern, env_modern$REGION %in% c('SOUTH CAROLINA', 'FLORIDA'))
+##mod_envscfl = subset(env_modern, REGION %in% c('SOUTH CAROLINA', 'FLORIDA'))
+##mod_mob_inscfl = make_mob_in(mod_sitexscfl, mod_envscfl)
+##mob_stats = get_mob_stats(mod_mob_inscfl, 'REGION')
+##mod_deltaS = get_delta_stats(mod_mob_inscfl, 'REGION', ref_group = 'SOUTH CAROLINA', log_scale = T,
+                              ##nperm = 50)
+##plot(deltaS, 'FLORIDA', 'SOUTH CAROLINA', same_scale = T)
+
+install.packages(c("maps","sp","maptools","rgdal","lattice","classInt"))
+library(maps)
+library(sp)
+library(maptools)
+library(rgdal)
+library(lattice)
+library(classInt)
+southeast = map(database = "state", regions = c("north carolina", "south carolina", "georgia", "florida"))
+se_coast = map(database = "county", regions = c("north carolina,dare", "north carolina,pasquotank", "north carolina,hyde", "north carolina,pamlico", "north carolina,beaufort", "north carolina,onslow", "north carolina,carteret", 
+                                                "north carolina,pender", "north carolina,new hanover", "north carolina,brunswick", "north carolina,craven", "north carolina,perquimans", "north carolina,camden", "north carolina,currituck:knotts",
+                                                "north carolina,currituck:knotts", "north carolina,currituck:spit", "north carolina,tyrell", "north carolina,washington", "north carolina,bertie", "north carolina,hertford", "north carolina,chowan",
+                                                "north carolina,jones", "north carolina,columbus", "south carolina,horry", "south carolina,marion", "south carolina,georgetown", "south carolina,charleston", "south carolina,berkeley",
+                                                "south carolina,dorchester", "south carolina,colleton", "south carolina,beaufort", "south carolina,jasper", "south carolina,hampton", "georgia,effingham", "georgia,chatham", "georgia,bryan", "georgia,liberty",
+                                                "georgia,mcintosh", "georgia,long", "georgia,glynn", "georgia,wayne", "georgia,camden", "georgia,brantley", "georgia,chariton", "florida,nassau", "florida,duval", "florida,saint johns", "florida,clay",
+                                                "florida,putnam", "florida,flagler", "florida,volusia", "florida,brevard", "florida,indian river", "florida,orange", "florida,osceola", "florida,seminole",
+                                                fill = T, plot = F))
+IDs = sub(c("^north carolina,", "^south carolina,", "^georgia,", "^florida,"),"",se_coast$names)
+secoast_sp = map2SpatialPolygons(se_coast,IDs,CRS("+proj=longlat"))
+plot(secoast_sp, axes = T)
+fish_pastpop = subset(sitexsp %in% env$period=="past")
+se_spdf = SpatialPolygonsDataFrame(secoast_sp,fish_historic)
