@@ -97,9 +97,9 @@ sitexsp = read.csv('./data/sitexsp_eventnames.csv', row.names = 1)
 
 env = dat_sub[match(row.names(sitexsp), dat_sub$EVENTNAME), 
               c('EVENTNAME', 'REGION', 'LONGITUDESTART', 'LATITUDESTART')]
-names(env) = c('EVENTNAME', 'REGION', 'x', 'y')
 #write.csv(env, file="./data/env.csv", row.names=FALSE)
 env = read.csv('./data/env.csv')
+names(env) = c('EVENTNAME', 'REGION', 'y', 'x')
 
 library(vegan)
 fish_ca = cca(sitexsp)
@@ -239,16 +239,51 @@ se_spdf = SpatialPolygonsDataFrame(secoast_sp,fish_historic)
 spplot(se_spdf, '')
 
 
+## how to convert factors or strings to date
+## 4/12/1989
+my_date = "4/12/1989"
+my_date2 = as.Date(my_date, "%m/%d/%Y")
+sapply(strsplit(c(my_date, my_date), '/', fixed=T), function(x) x[3])
+##extracts the year
+
 ?vegan::diversity
 
-S = 1:1000
-h = hist(S, breaks=10)
 
 S_bins = as.integer(cut(S, h$breaks))
 plot(1:1000, 1:1000, col=terrain.colors(10)[S_bins])
 
+env_historic$year = as.numeric(substr(row.names(fish_historic), 1, 4))
+
+# ignore aggregation until site id's have been rectified in a meaningful way
+tst = aggregate(fish_historic, list(env_historic$period), FUN = 'sum')
+
+env_historic$S = rowSums(fish_historic > 0)
+
+S_breaks = hist(env_historic$S, plot=FALSE)$breaks
+S_bins = as.integer(cut(env_historic$S, S_breaks))
+
+pdf('sr_map.pdf')
+par(mfrow=c(1,2))
+map(database = "county", regions = counties)
+points(env_historic$y[env_historic$period == 'past'],
+       env_historic$x[env_historic$period == 'past'],
+       col=terrain.colors(15)[S_bins[env_historic$period == 'past']],
+       pch=19, cex=.5)
+map(database = "county", regions = counties)
+points(env_historic$y[env_historic$period == 'modern'],
+       env_historic$x[env_historic$period == 'modern'],
+       col=terrain.colors(15)[S_bins[env_historic$period == 'modern']],
+       pch=19, cex=.5)
+dev.off()
+
+S_modern = subset(fish_historic, env$period == "modern")
+lat_modern = subset(env$x, env$period == "modern")
+long_modern = subset(env$y, env$period == "modern")
+h_modern = hist(S_modern)
+S_binsmod = as.integer(cut(S_modern, h_modern$breaks))
+
 
 map(database = "county", regions = counties)
-points(long, lat, col=)
+points(long, lat, col=terrain.colors(10)[S_bins])
 
 
