@@ -66,11 +66,17 @@ historic_mob_in = make_mob_in(fish_historic, env_historic)
 historic_mob_stats = get_mob_stats(historic_mob_in, 'period', nperm=200)
 plot(historic_mob_stats, multipanel=T)
 historic_deltaS = get_delta_stats(historic_mob_in, 'period', ref_group = 'past',
-                                  log_scale = T, inds = 10, nperm = 1)
+                                  log_scale = T, nperm = 200)
+historic_deltaS
+
+
+
 ##run 200 perms
+pdf("./figs/deltaS_results.pdf")
 plot(historic_deltaS, 'modern', 'past', same_scale = T)
 stack_effects(historic_deltaS, 'modern')
 stack_effects(historic_deltaS, 'modern', prop = T)
+dev.off()
 ##start looking at compositional effects (constrained ordination)
 ?"mobr"
 
