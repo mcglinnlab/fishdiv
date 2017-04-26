@@ -64,10 +64,14 @@ env_historic = subset(env, !is.na(env$period))
 
 historic_mob_in = make_mob_in(fish_historic, env_historic)
 historic_mob_stats = get_mob_stats(historic_mob_in, 'period', nperm=200)
-plot(historic_mob_stats, multipanel=T)
 historic_deltaS = get_delta_stats(historic_mob_in, 'period', ref_group = 'past',
                                   log_scale = T, nperm = 200)
 historic_deltaS
+
+pdf("./figs/mob_stats_boxplots.pdf")
+plot(historic_mob_stats, multipanel=T)
+dev.off()
+
 
 
 
