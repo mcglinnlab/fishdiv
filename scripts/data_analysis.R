@@ -198,10 +198,10 @@ pdf('SR~year.pdf')
 plot((log(env$S))~env$YEAR)
 lines(lowess(as.numeric(env$YEAR), log(env$S)), col='blue', lwd=2)
 mod = lm(log(env$S) ~ as.numeric(env$YEAR))
+abline(mod, col='red')
 dev.off()
 
 ##analysis of log(S)~trawl/eventname
-abline(mod, col='red')
 plot((log(env$S))~env$EVENTNAME)
 lines(lowess(as.numeric(env$EVENTNAME), log(env$S)), col='blue', lwd=2)
 mod2 = lm(log(env$S) ~ as.numeric(env$EVENTNAME))
