@@ -191,3 +191,19 @@ S_binsmod = as.integer(cut(S_modern, h_modern$breaks))
 
 map(database = "county", regions = counties)
 points(long, lat, col=terrain.colors(10)[S_bins])
+
+##analysis of log(S)~year
+env$S = rowSums(sitexsp > 0)
+pdf('SR~year.pdf')
+plot((log(env$S))~env$YEAR)
+lines(lowess(as.numeric(env$YEAR), log(env$S)), col='blue', lwd=2)
+mod = lm(log(env$S) ~ as.numeric(env$YEAR))
+dev.off()
+
+##analysis of log(S)~trawl/eventname
+abline(mod, col='red')
+plot((log(env$S))~env$EVENTNAME)
+lines(lowess(as.numeric(env$EVENTNAME), log(env$S)), col='blue', lwd=2)
+mod2 = lm(log(env$S) ~ as.numeric(env$EVENTNAME))
+abline(mod2, col='red')
+
