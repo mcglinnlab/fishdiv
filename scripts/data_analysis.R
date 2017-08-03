@@ -63,15 +63,17 @@ fish_historic = subset(sitexsp, !is.na(env$period))
 env_historic = subset(env, !is.na(env$period))
 
 historic_mob_in = make_mob_in(fish_historic, env_historic)
-historic_mob_stats = get_mob_stats(historic_mob_in, 'period', nperm=200)
+historic_mob_stats = get_mob_stats(historic_mob_in, 'period', ref_group = 'past',
+                                   index = c("N","S","S_rare","S_asymp","ENS_PIE"),
+                                             n_perm=200)
 historic_deltaS = get_delta_stats(historic_mob_in, 'period', ref_group = 'past',
                                   log_scale = T, nperm = 200)
 historic_deltaS
 
-pdf("./figs/mob_stats_boxplots.pdf")
-plot(historic_mob_stats, multipanel=T)
+pdf("./figs/mob_stats_boxplots_updates.pdf")
+plot(historic_mob_stats, index = c("N", "S", "S_rare", "S_asymp", "ENS_PIE"), 
+     ref_group = 'past', multipanel=T)
 dev.off()
-
 
 
 
@@ -168,7 +170,7 @@ env_historic$S = rowSums(fish_historic > 0)
 S_breaks = hist(env_historic$S, plot=FALSE)$breaks
 S_bins = as.integer(cut(env_historic$S, S_breaks))
 
-pdf('sr_map.pdf')
+pdf('./figs/sr_map.pdf')
 par(mfrow=c(1,2))
 map(database = "county", regions = counties)
 points(env_historic$x[env_historic$period == 'past'],
@@ -194,7 +196,7 @@ points(long, lat, col=terrain.colors(10)[S_bins])
 
 ##analysis of log(S)~year
 env$S = rowSums(sitexsp > 0)
-pdf('SR~year.pdf')
+pdf('./figs/SR~year.pdf')
 plot((log(env$S))~env$YEAR)
 lines(lowess(as.numeric(env$YEAR), log(env$S)), col='blue', lwd=2)
 mod = lm(log(env$S) ~ as.numeric(env$YEAR))
