@@ -55,7 +55,7 @@ plot(deltaS, 'GEORGIA', 'SOUTH CAROLINA', same_scale=T)
 # add Time Period variable to env
 
 env$period = ifelse(env$EVENTNAME %in% 1990001:1995563,
-                    'past', ifelse(env$EVENTNAME %in% 2010001:2015657,
+                    'historic', ifelse(env$EVENTNAME %in% 2010001:2015657,
                                    'modern', NA))
 
 ##historic and modern data for 1990-1995 and 2010-2015 ----
@@ -63,25 +63,25 @@ fish_historic = subset(sitexsp, !is.na(env$period))
 env_historic = subset(env, !is.na(env$period))
 
 historic_mob_in = make_mob_in(fish_historic, env_historic)
-historic_mob_stats = get_mob_stats(historic_mob_in, 'period', ref_group = 'past',
+historic_mob_stats = get_mob_stats(historic_mob_in, 'period', ref_group = 'historic',
                                    index = c("N","S","S_rare","S_asymp","ENS_PIE"),
                                              n_perm=200)
-historic_deltaS = get_delta_stats(historic_mob_in, 'period', ref_group = 'past',
+historic_deltaS = get_delta_stats(historic_mob_in, 'period', ref_group = 'historic',
                                   log_scale = T, nperm = 200)
 historic_deltaS
 
 pdf("./figs/mob_stats_boxplots_updates.pdf")
 plot(historic_mob_stats, index = c("N", "S", "S_rare", "S_asymp", "ENS_PIE"), 
-     ref_group = 'past', multipanel=T)
+     ref_group = 'historic', multipanel=T)
 dev.off()
 
 
 
 ##run 200 perms
 pdf("./figs/deltaS_results.pdf")
-plot(historic_deltaS, 'modern', 'past', same_scale = T)
-stack_effects(historic_deltaS, 'modern')
-stack_effects(historic_deltaS, 'modern', prop = T)
+plot(historic_deltaS, 'modern', 'historic', same_scale = T)
+overlap_effects(historic_deltaS, 'modern', display = "raw")
+overlap_effects(historic_deltaS, 'modern', display = "stacked", prop = T)
 dev.off()
 ##start looking at compositional effects (constrained ordination)
 ?"mobr"
@@ -173,9 +173,9 @@ S_bins = as.integer(cut(env_historic$S, S_breaks))
 pdf('./figs/sr_map.pdf')
 par(mfrow=c(1,2))
 map(database = "county", regions = counties)
-points(env_historic$x[env_historic$period == 'past'],
-       env_historic$y[env_historic$period == 'past'],
-       col=terrain.colors(15)[S_bins[env_historic$period == 'past']],
+points(env_historic$x[env_historic$period == 'historic'],
+       env_historic$y[env_historic$period == 'historic'],
+       col=terrain.colors(15)[S_bins[env_historic$period == 'historic']],
        pch=19, cex=.5)
 map(database = "county", regions = counties)
 points(env_historic$x[env_historic$period == 'modern'],
