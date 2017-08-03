@@ -209,3 +209,11 @@ lines(lowess(as.numeric(env$EVENTNAME), log(env$S)), col='blue', lwd=2)
 mod2 = lm(log(env$S) ~ as.numeric(env$EVENTNAME))
 abline(mod2, col='red')
 
+##analysis of log(N)~year
+env$N = rowSums(sitexsp)
+pdf('./figs/N~year.pdf')
+plot((log(env$N))~env$EVENTNAME)
+lines(lowess(as.numeric(env$EVENTNAME), log(env$N)), col='blue',lwd=2)
+mod3 = lm(log(env$N) ~ as.numeric(env$EVENTNAME))
+abline(mod3, col = 'red')
+dev.off()
