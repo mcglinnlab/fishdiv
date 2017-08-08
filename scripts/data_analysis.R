@@ -75,6 +75,16 @@ plot(historic_mob_stats, index = c("N", "S", "S_rare", "S_asymp", "ENS_PIE"),
      ref_group = 'historic', multipanel=T)
 dev.off()
 
+##creating rarefaction curves and SAD curve
+plot_rarefaction(historic_mob_in, 'period', 'historic', 'indiv', pooled=F, lwd=2,
+                 leg_loc='topright')
+plot_rarefaction(historic_mob_in, 'period', 'historic', 'indiv', pooled=T, lwd=4,
+                 leg_loc='topright')
+plot_rarefaction(historic_mob_in, 'period', 'historic', 'spat', 
+                 xy_coords = historic_mob_in$spat, lwd = 4, leg_loc = 'topright')
+plot_abu(historic_mob_in, 'period', 'historic', type='rad', pooled=F, log='x',
+         leg_loc = 'topright')
+plot_abu(historic_mob_in, 'period', 'historic', type='rad', pooled=T, log='x')
 
 
 ##run 200 perms
@@ -165,6 +175,7 @@ env_historic$year = as.numeric(substr(row.names(fish_historic), 1, 4))
 # ignore aggregation until site id's have been rectified in a meaningful way
 tst = aggregate(fish_historic, list(env_historic$period), FUN = 'sum')
 
+##SR map
 env_historic$S = rowSums(fish_historic > 0)
 
 S_breaks = hist(env_historic$S, plot=FALSE)$breaks
@@ -184,6 +195,28 @@ points(env_historic$x[env_historic$period == 'modern'],
        pch=19, cex=.5)
 dev.off()
 
+##N map
+env_historic$N = rowSums(fish_historic)
+N_breaks = hist(env_historic$N, plot=FALSE)$breaks
+N_bins = as.integer(cut(env_historic$N, N_breaks))
+
+
+pdf('./figs/N_map.pdf')
+par(mfrow=c(1,2))
+map(database = "county", regions = counties)
+points(env_historic$x[env_historic$period == 'historic'],
+       env_historic$y[env_historic$period == 'historic'],
+       col=terrain.colors(30)[N_bins[env_historic$period == 'historic']],
+       pch=19, cex=.5)
+map(database = "county", regions = counties)
+points(env_historic$x[env_historic$period == 'modern'],
+       env_historic$y[env_historic$period == 'modern'],
+       col=terrain.colors(30)[N_bins[env_historic$period == 'modern']],
+       pch=19, cex=.5)
+dev.off()
+
+
+##tests?
 S_modern = subset(fish_historic, env$period == "modern")
 lat_modern = subset(env$x, env$period == "modern")
 long_modern = subset(env$y, env$period == "modern")
@@ -193,6 +226,8 @@ S_binsmod = as.integer(cut(S_modern, h_modern$breaks))
 
 map(database = "county", regions = counties)
 points(long, lat, col=terrain.colors(10)[S_bins])
+
+
 
 ##analysis of log(S)~year
 env$S = rowSums(sitexsp > 0)
