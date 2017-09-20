@@ -253,14 +253,8 @@ mod3 = lm(log(env$N) ~ as.numeric(env$YEAR))
 abline(mod3, col = 'red', lwd = 4)
 dev.off()
 
-##seeing what fish are different between the two communities
-sitexsp = as.data.frame(sitexsp)
-allsp = names(sitexsp)
-allsp[colSums(sitexsp[env$period == 'historic', ]) == 0 ]
-barplot (beside = T)
-rank colSums
 
-##installing fishbase
+##adjusting fishbase compatibility
 library("rfishbase")
 library("lettercase")
 splist = names(sitexsp)
@@ -270,5 +264,24 @@ sp = sapply(name_split, function(x) x[2])
 names(sitexsp) = paste(genera, sp)
 ##write.csv(sitexsp, file = "./data/sitexsp_fishbase.csv", row.names=TRUE)
 sitexsp_fishbase = read.csv("./data/sitexsp_fishbase.csv", row.names = 1)
-fish_past = subset(sitexsp, env$period == "historic")
-fish_modern = subset(sitexsp, env$period == "modern")
+
+
+##seeing what fish are different between the two communities
+sp_historic = colnames(subset(sitexsp, env$period == "historic"))
+counts_historic = colSums(subset(sitexsp, env$period == "historic"))
+historic_counts = data.frame(sp_historic, counts_historic)
+historic_counts$rank = rank(counts_historic, na.last = T)
+historic_counts
+
+sp_modern = colnames(subset(sitexsp, env$period == "modern"))
+counts_modern = colSums(subset(sitexsp, env$period == "modern"))
+modern_counts = data.frame(sp_modern, counts_modern)
+modern_counts$rank = rank(counts_modern, na.last = T)
+modern_counts
+
+fish_rank = matrix(c(historic_counts$rank, modern_counts$rank), nrow = 2,
+                   ncol = 208, byrow = T, dimnames = list(c("historic", "modern"),
+                                                          sp_modern))
+rank_plot = barplot(fish_rank, beside = T, 
+                    col = c("lightblue", "lightcyan"),
+                    main = "Fish Abundance Ranks in Southeast Atlantic")
