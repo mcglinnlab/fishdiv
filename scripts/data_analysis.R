@@ -56,7 +56,7 @@ plot(deltaS, 'GEORGIA', 'SOUTH CAROLINA', same_scale=T)
 
 env$period = ifelse(env$EVENTNAME %in% 1990001:1995563,
                     'historic', ifelse(env$EVENTNAME %in% 2010001:2015657,
-                                   'modern', NA))
+                                   'modern', 'other'))
 
 ##historic and modern data for 1990-1995 and 2010-2015 ----
 fish_historic = subset(sitexsp, !is.na(env$period))
@@ -252,3 +252,23 @@ lines(lowess(as.numeric(env$YEAR), log(env$N)), col='blue',lwd = 5)
 mod3 = lm(log(env$N) ~ as.numeric(env$YEAR))
 abline(mod3, col = 'red', lwd = 4)
 dev.off()
+
+##seeing what fish are different between the two communities
+sitexsp = as.data.frame(sitexsp)
+allsp = names(sitexsp)
+allsp[colSums(sitexsp[env$period == 'historic', ]) == 0 ]
+barplot (beside = T)
+rank colSums
+
+##installing fishbase
+library("rfishbase")
+library("lettercase")
+splist = names(sitexsp)
+name_split = strsplit(tolower(splist), '.', fixed = T)
+genera = sapply(name_split, function(x) str_ucfirst(x[[1]]))
+sp = sapply(name_split, function(x) x[2])
+names(sitexsp) = paste(genera, sp)
+##write.csv(sitexsp, file = "./data/sitexsp_fishbase.csv", row.names=TRUE)
+sitexsp_fishbase = read.csv("./data/sitexsp_fishbase.csv", row.names = 1)
+fish_past = subset(sitexsp, env$period == "historic")
+fish_modern = subset(sitexsp, env$period == "modern")
