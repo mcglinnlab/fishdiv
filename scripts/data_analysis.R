@@ -279,9 +279,67 @@ modern_counts = data.frame(sp_modern, counts_modern)
 modern_counts$rank = rank(counts_modern, na.last = T)
 modern_counts
 
+
 fish_rank = matrix(c(historic_counts$rank, modern_counts$rank), nrow = 2,
                    ncol = 208, byrow = T, dimnames = list(c("historic", "modern"),
                                                           sp_modern))
 rank_plot = barplot(fish_rank, beside = T, 
                     col = c("lightblue", "lightcyan"),
                     main = "Fish Abundance Ranks in Southeast Atlantic")
+modern_absent = subset(modern_counts, modern_counts$counts_modern == "0")
+historic_absent = subset(historic_counts, historic_counts$counts_historic == "0") 
+diff = rownames(modern_absent)[!(rownames(modern_absent) %in% rownames(historic_absent))]
+diff
+
+qts_historic = ecdf(counts_historic)(counts_historic)
+qts_modern = ecdf(counts_modern)(counts_modern)
+plot(0, 0, ylim=c(0,1), xlim=c(1,2), frame.plot=F, type='n', axes =F, xlab='', ylab='quantile')
+axis(side=2)
+for(i in seq_along(qts_historic))
+points(c(1,2), c(qts_historic[i], qts_modern[i]), type='l')
+
+
+##Regional Analysis
+regfish_modern = subset(sitexsp, env$period == 'modern')
+regenv_modern = subset(env, env$period == 'modern')
+regmodern_mob_in = make_mob_in(regfish_modern, regenv_modern)
+regmodern_mob_stats = get_mob_stats(regmodern_mob_in, 'REGION',
+                                    ref_group = 'SOUTH CAROLINA',
+                                   index = c("N","S","S_rare","S_asymp","ENS_PIE"),
+                                   n_perm=200)
+plot(regmodern_mob_stats, index = c("N", "S", "S_rare", "S_asymp", "ENS_PIE"), 
+     ref_group = 'SOUTH CAROLINA', multipanel=T)
+regmodern_deltaS = get_delta_stats(regmodern_mob_in, 'REGION', ref_group = 'SOUTH CAROLINA',
+                                  log_scale = T, n_perm = 10)
+regmodern_deltaS
+plot_rarefaction(regmodern_mob_in, 'REGION', 'SOUTH CAROLINA', 'indiv', pooled=F, lwd=2,
+                 leg_loc='topright')
+plot_rarefaction(regmodern_mob_in, 'REGION', 'SOUTH CAROLINA', 'indiv', pooled=T, lwd=4,
+                 leg_loc='topright')
+plot_rarefaction(regmodern_mob_in, 'REGION', 'SOUTH CAROLINA', 'spat', 
+                 xy_coords = regmodern_mob_in$spat, lwd = 4, leg_loc = 'topright')
+plot_abu(regmodern_mob_in, 'REGION', 'SOUTH CAROLINA', type ='rad', pooled=F, log='x',
+         leg_loc = 'topright')
+plot_abu(regmodern_mob_in, 'REGION', 'SOUTH CAROLINA', type='rad', pooled=T, log='x')
+
+
+regfish_historic = subset(sitexsp, env$period == 'historic')
+regenv_historic = subset(env, env$period == 'historic')
+reghistoric_mob_in = make_mob_in(regfish_historic, regenv_historic)
+reghistoric_mob_stats = get_mob_stats(regmodern_mob_in, 'REGION',
+                                       ref_group = 'SOUTH CAROLINA',
+                                       index = c("N","S","S_rare","S_asymp","ENS_PIE"),
+                                       n_perm=200)
+plot(reghistoric_mob_stats, index = c("N", "S", "S_rare", "S_asymp", "ENS_PIE"), 
+     ref_group = 'SOUTH CAROLINA', multipanel=T)
+reghistoric_deltaS = get_delta_stats(reghistoric_mob_in, 'REGION', ref_group = 'SOUTH CAROLINA',
+                                     log_scale = T, n_perm = 10)
+plot_rarefaction(reghistoric_mob_in, 'REGION', 'SOUTH CAROLINA', 'indiv', pooled=F, lwd=2,
+                 leg_loc='topright')
+plot_rarefaction(reghistoric_mob_in, 'REGION', 'SOUTH CAROLINA', 'indiv', pooled=T, lwd=4,
+                 leg_loc='topright')
+plot_rarefaction(reghistoric_mob_in, 'REGION', 'SOUTH CAROLINA', 'spat', 
+                 xy_coords = regmodern_mob_in$spat, lwd = 4, leg_loc = 'topright')
+plot_abu(reghistoric_mob_in, 'REGION', 'SOUTH CAROLINA', type ='rad', pooled=F, log='x',
+         leg_loc = 'topright')
+plot_abu(reghistoric_mob_in, 'REGION', 'SOUTH CAROLINA', type='rad', pooled=T, log='x')
