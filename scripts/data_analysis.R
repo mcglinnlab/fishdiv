@@ -326,12 +326,13 @@ plot_abu(regmodern_mob_in, 'REGION', 'SOUTH CAROLINA', type='rad', pooled=T, log
 regfish_historic = subset(sitexsp, env$period == 'historic')
 regenv_historic = subset(env, env$period == 'historic')
 reghistoric_mob_in = make_mob_in(regfish_historic, regenv_historic)
-reghistoric_mob_stats = get_mob_stats(regmodern_mob_in, 'REGION',
+reghistoric_mob_stats = get_mob_stats(reghistoric_mob_in, 'REGION',
                                        ref_group = 'SOUTH CAROLINA',
                                        index = c("N","S","S_rare","S_asymp","ENS_PIE"),
                                        n_perm=200)
 plot(reghistoric_mob_stats, index = c("N", "S", "S_rare", "S_asymp", "ENS_PIE"), 
-     ref_group = 'SOUTH CAROLINA', multipanel=T)
+     ref_group = 'SOUTH CAROLINA', multi_panel=T)
+
 reghistoric_deltaS = get_delta_stats(reghistoric_mob_in, 'REGION', ref_group = 'SOUTH CAROLINA',
                                      log_scale = T, n_perm = 10)
 plot_rarefaction(reghistoric_mob_in, 'REGION', 'SOUTH CAROLINA', 'indiv', pooled=F, lwd=2,
@@ -343,3 +344,45 @@ plot_rarefaction(reghistoric_mob_in, 'REGION', 'SOUTH CAROLINA', 'spat',
 plot_abu(reghistoric_mob_in, 'REGION', 'SOUTH CAROLINA', type ='rad', pooled=F, log='x',
          leg_loc = 'topright')
 plot_abu(reghistoric_mob_in, 'REGION', 'SOUTH CAROLINA', type='rad', pooled=T, log='x')
+
+
+
+##Comparing North to South
+northmodern_mob_stats = get_mob_stats(regmodern_mob_in, 'REGION2',
+                                    ref_group = 'South',
+                                    index = c("N","S","S_rare","S_asymp","ENS_PIE"),
+                                    n_perm=200)
+plot(northmodern_mob_stats, index = c("N", "S", "S_rare", "S_asymp", "ENS_PIE"), 
+     ref_group = 'South')
+regmodern_deltaS = get_delta_stats(regmodern_mob_in, 'REGION', ref_group = 'SOUTH CAROLINA',
+                                   log_scale = T, n_perm = 10)
+regmodern_deltaS
+plot_rarefaction(regmodern_mob_in, 'REGION2', 'South', 'indiv', pooled=F, lwd=2,
+                 leg_loc='topright')
+plot_rarefaction(regmodern_mob_in, 'REGION2', 'South', 'indiv', pooled=T, lwd=4,
+                 leg_loc='topright')
+plot_rarefaction(regmodern_mob_in, 'REGION2', 'South', 'spat', 
+                 xy_coords = regmodern_mob_in$spat, lwd = 4, leg_loc = 'topright')
+plot_abu(regmodern_mob_in, 'REGION2', 'South', type ='rad', pooled=F, log='x',
+         leg_loc = 'topright')
+plot_abu(regmodern_mob_in, 'REGION2', 'South', type='rad', pooled=T, log='x')
+
+
+northhistoric_mob_stats = get_mob_stats(reghistoric_mob_in, 'REGION2',
+                                      ref_group = 'South',
+                                      index = c("N","S","S_rare","S_asymp","ENS_PIE"),
+                                      n_perm=200)
+plot(northhistoric_mob_stats, index = c("N", "S", "S_rare", "S_asymp", "ENS_PIE"), 
+     ref_group = 'South')
+
+northhistoric_deltaS = get_delta_stats(northhistoric_mob_in, 'REGION2', ref_group = 'South',
+                                     log_scale = T, n_perm = 10)
+plot_rarefaction(reghistoric_mob_in, 'REGION2', 'South', 'indiv', pooled=F, lwd=2,
+                 leg_loc='topright')
+plot_rarefaction(reghistoric_mob_in, 'REGION2', 'South', 'indiv', pooled=T, lwd=4,
+                 leg_loc='topright')
+plot_rarefaction(reghistoric_mob_in, 'REGION2', 'South', 'spat', 
+                 xy_coords = regmodern_mob_in$spat, lwd = 4, leg_loc = 'topright')
+plot_abu(reghistoric_mob_in, 'REGION2', 'South', type ='rad', pooled=F, log='x',
+         leg_loc = 'topright')
+plot_abu(reghistoric_mob_in, 'REGION2', 'South', type='rad', pooled=T, log='x')

@@ -10,7 +10,6 @@
     # SAD distribution
 
 #import data
-library(readr)
 dat = read.csv('./data/bakernj.Coastal Survey.ABUNDANCEBIOMASS.2016-11-03T11.33.55.csv')
 ##determining number of unique nets (collection number) for each trawl (event name)
 n = NULL
@@ -62,10 +61,19 @@ head(dat_sub)
 uni_sci_sp = unique(dat$SPECIESSCIENTIFICNAME)
 ##write.csv(uni_sci_sp[!(uni_sci_sp %in% gd_sci_names$species)], './data/sp_names_filtered_out.csv', row.names=F)
 
+#Merge species names that were inconsistently used
+anchoa_rows = grep('ANCHOA', dat_sub$SPECIESSCIENTIFICNAME)
+dat_sub$SPECIESSCIENTIFICNAME[anchoa_rows] = 'ANCHOA'
+
+
+#Add coarse region variable
+dat_sub$REGION2 = ifelse(dat_sub$REGION %in% c('SOUTH CAROLINA', 'GEORGIA', 'FLORIDA'), 
+                         'South', 'North')
+
 # subset fish columns
 fish_cols = c('EVENTNAME','COLLECTIONNUMBER','SPECIESSCIENTIFICNAME',
               'SPECIESCOMMONNAME','NUMBERTOTAL','EFFORT','LOCATION',
-              'REGION','DEPTHZONE','STATIONCODE')
+              'REGION','DEPTHZONE','STATIONCODE', 'REGION2')
 dat_sub[1:5 , fish_cols]
 
 # run check that only one date applies to each event name
@@ -96,8 +104,8 @@ sitexsp = ifelse(is.na(sitexsp), 0, sitexsp)
 sitexsp = read.csv('./data/sitexsp_eventnames.csv', row.names = 1)
 
 env = dat_sub[match(row.names(sitexsp), dat_sub$EVENTNAME), 
-              c('EVENTNAME', 'REGION', 'LONGITUDESTART', 'LATITUDESTART', 'DATE')]
-names(env) = c('EVENTNAME', 'REGION', 'x', 'y','DATE')
+              c('EVENTNAME', 'REGION', 'REGION2', 'LONGITUDESTART', 'LATITUDESTART', 'DATE')]
+names(env) = c('EVENTNAME', 'REGION', 'REGION2', 'x', 'y','DATE')
 env$YEAR = sapply(strsplit(as.character(env$DATE), '-', fixed=T), function(x) x[3])
 env$MONTH = sapply(strsplit(as.character(env$DATE), '-', fixed=T), function(x) x[1])
 #write.csv(env, file="./data/env.csv", row.names=FALSE)
