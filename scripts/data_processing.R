@@ -73,8 +73,9 @@ dat_sub$REGION2 = ifelse(dat_sub$REGION %in% c('SOUTH CAROLINA', 'GEORGIA', 'FLO
 # subset fish columns
 fish_cols = c('EVENTNAME','COLLECTIONNUMBER','SPECIESSCIENTIFICNAME',
               'SPECIESCOMMONNAME','NUMBERTOTAL','EFFORT','LOCATION',
-              'REGION','DEPTHZONE','STATIONCODE', 'REGION2')
+              'REGION','DEPTHZONE','STATIONCODE', 'REGION2', 'DEPTHZONE')
 dat_sub[1:5 , fish_cols]
+dat_sub2 = subset(dat_sub, dat_sub$DEPTHZONE == 'INNER')
 
 # run check that only one date applies to each event name
 
@@ -93,17 +94,17 @@ sum(out!=2)
 
 
 # create site x sp matrix (sites as rows and species as columns)
-dat_sub$NUMBERTOTAL = as.integer(dat_sub$NUMBERTOTAL)
+dat_sub2$NUMBERTOTAL = as.integer(dat_sub2$NUMBERTOTAL)
 
-sitexsp = tapply(dat_sub$NUMBERTOTAL,
-                 list(dat_sub$EVENTNAME, 
-                      dat_sub$SPECIESSCIENTIFICNAME), 
+sitexsp = tapply(dat_sub2$NUMBERTOTAL,
+                 list(dat_sub2$EVENTNAME, 
+                      dat_sub2$SPECIESSCIENTIFICNAME), 
                  sum)
 sitexsp = ifelse(is.na(sitexsp), 0, sitexsp)
 ##write.csv(sitexsp,file = "./data/sitexsp_eventnames.csv", row.names=TRUE)
 sitexsp = read.csv('./data/sitexsp_eventnames.csv', row.names = 1)
 
-env = dat_sub[match(row.names(sitexsp), dat_sub$EVENTNAME), 
+env = dat_sub2[match(row.names(sitexsp), dat_sub2$EVENTNAME), 
               c('EVENTNAME', 'REGION', 'REGION2', 'LONGITUDESTART', 'LATITUDESTART', 'DATE')]
 names(env) = c('EVENTNAME', 'REGION', 'REGION2', 'x', 'y','DATE')
 env$YEAR = sapply(strsplit(as.character(env$DATE), '-', fixed=T), function(x) x[3])
