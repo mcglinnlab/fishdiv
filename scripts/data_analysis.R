@@ -34,7 +34,7 @@ env1990 = subset(env, env$EVENTNAME %in% 1990001:1990547)
 fish2015 = subset(sitexsp[ EVENTNAME = 2015001:2015657])
 
 
-
+install.packages('devtools')
 library(devtools)
 install_github('MoBiodiv/mobr')
 library(mobr)
@@ -63,15 +63,15 @@ fish_historic = subset(sitexsp, env$period != 'other')
 env_historic = subset(env, env$period != 'other')
 
 historic_mob_in = make_mob_in(fish_historic, env_historic)
-historic_mob_stats = get_mob_stats(historic_mob_in, 'period', ref_group = 'historic',
-                                   index = c("N","S","S_rare","S_asymp","S_PIE"),
+historic_mob_stats = get_mob_stats(historic_mob_in, 'period',
+                                   index = c("N","S","S_n","pct_rare","S_PIE"),
                                              n_perm=200)
 historic_deltaS = get_delta_stats(historic_mob_in, 'period', ref_group = 'historic',
                                   log_scale = T, n_perm = 200)
 historic_deltaS
 
 pdf("./figs/mob_stats_boxplots_updates.pdf")
-plot(historic_mob_stats, index = c("N", "S", "S_rare", "S_asymp", "S_PIE"), 
+plot(historic_mob_stats, index = c("N", "S", "S_n", "pct_rare", "S_PIE"), 
      ref_group = 'historic', multipanel=T)
 dev.off()
 
@@ -281,7 +281,7 @@ modern_counts
 
 
 fish_rank = matrix(c(historic_counts$rank, modern_counts$rank), nrow = 2,
-                   ncol = 208, byrow = T, dimnames = list(c("historic", "modern"),
+                   ncol = 199, byrow = T, dimnames = list(c("historic", "modern"),
                                                           sp_modern))
 rank_plot = barplot(fish_rank, beside = T, 
                     col = c("lightblue", "lightcyan"),
@@ -304,10 +304,9 @@ regfish_modern = subset(sitexsp, env$period == 'modern')
 regenv_modern = subset(env, env$period == 'modern')
 regmodern_mob_in = make_mob_in(regfish_modern, regenv_modern)
 regmodern_mob_stats = get_mob_stats(regmodern_mob_in, 'REGION',
-                                    ref_group = 'SOUTH CAROLINA',
-                                   index = c("N","S","S_rare","S_asymp","S_PIE"),
+                                   index = c("N","S","S_n","pct_rare","S_PIE"),
                                    n_perm=200)
-plot(regmodern_mob_stats, index = c("N", "S", "S_rare", "S_asymp", "S_PIE"), 
+plot(regmodern_mob_stats, index = c("N", "S", "S_n", "pct_rare", "S_PIE"), 
      ref_group = 'SOUTH CAROLINA', multipanel=T)
 regmodern_deltaS = get_delta_stats(regmodern_mob_in, 'REGION', ref_group = 'SOUTH CAROLINA',
                                   log_scale = T, n_perm = 10)
@@ -326,11 +325,10 @@ plot_abu(regmodern_mob_in, 'REGION', 'SOUTH CAROLINA', type='rad', pooled=T, log
 regfish_historic = subset(sitexsp, env$period == 'historic')
 regenv_historic = subset(env, env$period == 'historic')
 reghistoric_mob_in = make_mob_in(regfish_historic, regenv_historic)
-reghistoric_mob_stats = get_mob_stats(reghistoric_mob_in, 'REGION',
-                                       ref_group = 'SOUTH CAROLINA',
-                                       index = c("N","S","S_rare","S_asymp","S_PIE"),
+reghistoric_mob_stats = get_mob_stats(reghistoric_mob_in, 'REGION',                              ref_group = 'SOUTH CAROLINA',
+                                       index = c("N","S","S_n","pct_rare","S_PIE"),
                                        n_perm=200)
-plot(reghistoric_mob_stats, index = c("N", "S", "S_rare", "S_asymp", "S_PIE"), 
+plot(reghistoric_mob_stats, index = c("N", "S", "S_n", "pct_rare", "S_PIE"), 
      ref_group = 'SOUTH CAROLINA', multi_panel=T)
 
 reghistoric_deltaS = get_delta_stats(reghistoric_mob_in, 'REGION', ref_group = 'SOUTH CAROLINA',
@@ -348,11 +346,10 @@ plot_abu(reghistoric_mob_in, 'REGION', 'SOUTH CAROLINA', type='rad', pooled=T, l
 
 
 ##Comparing North to South
-northmodern_mob_stats = get_mob_stats(regmodern_mob_in, 'REGION2',
-                                    ref_group = 'South',
-                                    index = c("N","S","S_rare","S_asymp","S_PIE"),
+northmodern_mob_stats = get_mob_stats(regmodern_mob_in, 'REGION2',                                    ref_group = 'South',
+                                    index = c("N","S","S_n","pct_rare","S_PIE"),
                                     n_perm=200)
-plot(northmodern_mob_stats, index = c("N", "S", "S_rare", "S_asymp", "S_PIE"), 
+plot(northmodern_mob_stats, index = c("N", "S", "S_n", "pct_rare", "S_PIE"), 
      ref_group = 'South')
 regmodern_deltaS = get_delta_stats(regmodern_mob_in, 'REGION', ref_group = 'SOUTH CAROLINA',
                                    log_scale = T, n_perm = 10)
@@ -368,11 +365,10 @@ plot_abu(regmodern_mob_in, 'REGION2', 'South', type ='rad', pooled=F, log='x',
 plot_abu(regmodern_mob_in, 'REGION2', 'South', type='rad', pooled=T, log='x')
 
 
-northhistoric_mob_stats = get_mob_stats(reghistoric_mob_in, 'REGION2',
-                                      ref_group = 'South',
-                                      index = c("N","S","S_rare","S_asymp","S_PIE"),
+northhistoric_mob_stats = get_mob_stats(reghistoric_mob_in, 'REGION2',                                      ref_group = 'South',
+                                      index = c("N","S","S_n","pct_rare","S_PIE"),
                                       n_perm=200)
-plot(northhistoric_mob_stats, index = c("N", "S", "S_rare", "S_asymp", "S_PIE"), 
+plot(northhistoric_mob_stats, index = c("N", "S", "S_n", "pct_rare", "S_PIE"), 
      ref_group = 'South')
 
 northhistoric_deltaS = get_delta_stats(northhistoric_mob_in, 'REGION2', ref_group = 'South',
