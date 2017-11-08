@@ -52,11 +52,6 @@ deltaS = get_delta_stats(mob_in, 'REGION', ref_group='SOUTH CAROLINA', log_scale
                          nperm=5)
 plot(deltaS, 'GEORGIA', 'SOUTH CAROLINA', same_scale=T)
 
-# add Time Period variable to env
-
-env$period = ifelse(env$EVENTNAME %in% 1990001:1995563,
-                    'historic', ifelse(env$EVENTNAME %in% 2010001:2015657,
-                                   'modern', 'other'))
 
 ##historic and modern data for 1990-1995 and 2010-2015 ----
 fish_historic = subset(sitexsp, env$period != 'other')
@@ -264,7 +259,19 @@ sp = sapply(name_split, function(x) x[2])
 names(sitexsp) = paste(genera, sp)
 ##write.csv(sitexsp, file = "./data/sitexsp_fishbase.csv", row.names=TRUE)
 sitexsp_fishbase = read.csv("./data/sitexsp_fishbase.csv", row.names = 1)
+fish = validate_names(names(sitexsp), )
+vuln = species(fish, fields = 'Vulnerability')
+w = setdiff(names(sitexsp), vuln$sciname)
+w
 
+seamap_list = names(sitexsp)
+fish_base_names = sapply(seamap_list, validate_names)
+fish_base_nulls = sapply(fish_base_names, function(x) is.null(x[[1]]))
+fish_base_names[fish_base_nulls] = NA
+fish_base_names = unlist(fish_base_names)
+name_lookup = data.frame(seamap = names(fish_base_names), fishbase = fish_base_names)
+name_lookup$diff = name_lookup$seamap == name_lookup$fishbase
+rownames(name_lookup) = NULL
 
 ##seeing what fish are different between the two communities
 sp_historic = colnames(subset(sitexsp, env$period == "historic"))
@@ -325,7 +332,7 @@ plot_abu(regmodern_mob_in, 'REGION', 'SOUTH CAROLINA', type='rad', pooled=T, log
 regfish_historic = subset(sitexsp, env$period == 'historic')
 regenv_historic = subset(env, env$period == 'historic')
 reghistoric_mob_in = make_mob_in(regfish_historic, regenv_historic)
-reghistoric_mob_stats = get_mob_stats(reghistoric_mob_in, 'REGION',                              ref_group = 'SOUTH CAROLINA',
+reghistoric_mob_stats = get_mob_stats(reghistoric_mob_in, 'REGION',
                                        index = c("N","S","S_n","pct_rare","S_PIE"),
                                        n_perm=200)
 plot(reghistoric_mob_stats, index = c("N", "S", "S_n", "pct_rare", "S_PIE"), 
@@ -346,7 +353,7 @@ plot_abu(reghistoric_mob_in, 'REGION', 'SOUTH CAROLINA', type='rad', pooled=T, l
 
 
 ##Comparing North to South
-northmodern_mob_stats = get_mob_stats(regmodern_mob_in, 'REGION2',                                    ref_group = 'South',
+northmodern_mob_stats = get_mob_stats(regmodern_mob_in, 'REGION2',
                                     index = c("N","S","S_n","pct_rare","S_PIE"),
                                     n_perm=200)
 plot(northmodern_mob_stats, index = c("N", "S", "S_n", "pct_rare", "S_PIE"), 
@@ -365,7 +372,7 @@ plot_abu(regmodern_mob_in, 'REGION2', 'South', type ='rad', pooled=F, log='x',
 plot_abu(regmodern_mob_in, 'REGION2', 'South', type='rad', pooled=T, log='x')
 
 
-northhistoric_mob_stats = get_mob_stats(reghistoric_mob_in, 'REGION2',                                      ref_group = 'South',
+northhistoric_mob_stats = get_mob_stats(reghistoric_mob_in, 'REGION2',
                                       index = c("N","S","S_n","pct_rare","S_PIE"),
                                       n_perm=200)
 plot(northhistoric_mob_stats, index = c("N", "S", "S_n", "pct_rare", "S_PIE"), 
